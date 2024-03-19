@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      # Install necessary dependencies
+      - apt-get update && apt-get install -y postgresql-client
+
+  pre_build:
+    commands:
+      # Connect to the PostgreSQL RDS instance and create a new database if needed
+      - psql capstone.cluster-cxqce0ogmanp.us-east-1.rds.amazonaws.com -U postgres -c "CREATE DATABASE IF NOT EXISTS your_database_name;"
+
+  build:
+    commands:
+      # Import the database script from GitHub and execute it against the PostgreSQL RDS instance
+      - git clone https://github.com/zao12345/simple-bus-ticketing-app.git /tmp/simple-bus-ticketing-app
+      - psql -h capstone.cluster-cxqce0ogmanp.us-east-1.rds.amazonaws.com -U postgres -d capstone -f /tmp/simple-bus-ticketing-app/DATABASE\ FILE/sbtbsphp.sql
+
+artifacts:
+  files:
+    - '**/*'
